@@ -12,7 +12,7 @@ trait Default {
     Defaults.defaultSettings ++
     EclipsePlugin.settings ++
     GraphPlugin.graphSettings ++ Seq(
-      organization := "com.ferega",
+      organization := "com.ferega.props",
       version      := "0.0.0-SNAPSHOT",
       scalaVersion := "2.11.1"
     )
@@ -21,7 +21,7 @@ trait Default {
     default ++ Seq(
       EclipseKeys.projectFlavor := EclipseProjectFlavor.Scala,
       unmanagedSourceDirectories in Compile := (scalaSource in Compile).value :: Nil,
-      unmanagedSourceDirectories in Test    := Nil,
+      unmanagedSourceDirectories in Test := (scalaSource in Test).value :: Nil,
       scalacOptions := Seq(
         "-deprecation",
         "-encoding", "UTF-8",
@@ -45,8 +45,10 @@ trait Default {
     default ++ Seq(
       EclipseKeys.projectFlavor := EclipseProjectFlavor.Java,
       autoScalaLibrary          := false,
+      crossPaths                := false,
+      testOptions               += Tests.Argument(TestFrameworks.JUnit, "-v", "-q"),
       unmanagedSourceDirectories in Compile := (javaSource in Compile).value :: Nil,
-      unmanagedSourceDirectories in Test    := Nil,
+      unmanagedSourceDirectories in Test    := (javaSource in Test).value :: Nil,
       javacOptions := Seq(
         "-deprecation",
         "-encoding", "UTF-8",
@@ -60,16 +62,21 @@ trait Default {
 // ----------------------------------------------------------------------------
 
 trait Dependencies {
+  val jUnit          = "junit"          %  "junit"           % "4.11"     % "test"
+  val jUnitInterface = "com.novocode"   %  "junit-interface" % "0.11-RC1" % "test"
+  val reflectApi     = "org.scala-lang" %  "scala-reflect"   % "2.11.1"
+  val scalaTest      = "org.scalatest"  %% "scalatest"       % "2.2.0"    % "test"
 }
 
 // ----------------------------------------------------------------------------
 
-object LSysBuild extends Build with Default with Dependencies {
+object PropsLoaderBuild extends Build with Default with Dependencies {
   lazy val javaApi  = Project(
     "java-api",
     file("JavaApi"),
     settings = java ++ publishing ++ Seq(
-      name := "PropsLoader-JavaApi"
+      name := "PropsLoader-JavaApi",
+      libraryDependencies ++= Seq(jUnit, jUnitInterface)
     )
   )
 
@@ -77,7 +84,8 @@ object LSysBuild extends Build with Default with Dependencies {
     "scala-api",
     file("ScalaApi"),
     settings = scala ++ publishing ++ Seq(
-      name := "PropsLoad-ScalaApi"
+      name := "PropsLoader-ScalaApi",
+      libraryDependencies ++= Seq(reflectApi, scalaTest)
     )
   ) dependsOn(javaApi)
 }
