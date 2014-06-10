@@ -1,13 +1,24 @@
 package com.ferega.props
 package sapi
 
-import Implicits._
+import java.util.Optional
 
-class PropsLoader(val useSystemProps: Boolean, val resolvablePathList: japi.PropsPath*) {
+object PropsLoader {
+  private def optionalToOption[T](jopt: Optional[T]): Option[T] =
+    if (jopt.isPresent) {
+      Some(jopt.get)
+    } else {
+      None
+    }
+}
+
+class PropsLoader(val useSystemProps: Boolean, val resolvablePathList: japi.PropsPath*) extends DefaultConverters {
+  import PropsLoader._
+
   private val baseLoader = new japi.PropsLoader(useSystemProps, resolvablePathList: _*)
 
     def opt[T](key: String)(implicit ev: ValueConverter[T]): Option[T] = {
-      val valueOpt = baseLoader.opt(key).toOption
+      val valueOpt = optionalToOption(baseLoader.opt(key))
       valueOpt map { value =>
         try {
           ev.convert(value)

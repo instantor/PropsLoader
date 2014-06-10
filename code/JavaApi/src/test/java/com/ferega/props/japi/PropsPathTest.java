@@ -20,11 +20,6 @@ public class PropsPathTest {
     props.setProperty(path1, path1Resolved);
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  public void creationZero() {
-    new PropsPath();
-  }
-
   @Test
   public void fileOne() throws IOException {
     final File expected    = new File(path1);

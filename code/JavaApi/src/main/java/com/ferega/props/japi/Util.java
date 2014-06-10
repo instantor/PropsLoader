@@ -8,14 +8,18 @@ import java.util.Properties;
 
 final class Util {
   public static File createFile(final File base, final String ... path) {
+    final File result;
+
     final int len = path.length;
     if (len == 0) {
-      return base;
+      result = base;
     } else {
       final String head = path[0];
       final String[] tail = Arrays.copyOfRange(path, 1, len);
-      return createFile(new File(base, head), tail);
+      result = createFile(new File(base, head), tail);
     }
+
+    return result;
   }
 
   public static Properties loadPropsFromFile(final File file) {
@@ -30,18 +34,22 @@ final class Util {
 
   @SafeVarargs
   public static Optional<String> orElseOpt(final Optional<String> ... optList) {
+    final Optional<String> result;
+
     final int len = optList.length;
     if (len == 0) {
-      return Optional.empty();
+      result = Optional.empty();
     } else {
       final Optional<String> head = optList[0];
       final Optional<String>[] tail = Arrays.copyOfRange(optList, 1, len);
 
       if (head.isPresent()) {
-        return head;
+        result = head;
       } else {
-        return orElseOpt(tail);
+        result = orElseOpt(tail);
       }
     }
+
+    return result;
   }
 }

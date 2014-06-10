@@ -10,7 +10,7 @@ trait ValueConverter[T] {
 
 object ValueConverter {
   def apply[T: TypeTag](f: String => T) = new ValueConverter[T] {
-    val name = typeOf[T].typeSymbol.fullName
+    def name = symbolOf[T].fullName
 
     def convert(value: String): T =
       try {
