@@ -7,19 +7,18 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
 public class PropsPath {
   private final String base;
   private final String[] partList;
 
-  private final static Pattern ResolvablePattern = Pattern.compile("^\\$([a-zA-Z_.]+)\\$$");
-  private final static String UnresolvableErrMsg = "An error occured while resolving path part \"%1\": key \"%2\" not found in properties";
+  private final static Pattern ResolvablePattern = Pattern.compile("^\\$([a-zA-Z0-9_.]+)\\$$");
+  private final static String UnresolvableErrMsg = "An error occured while resolving path part \"%s\": key \"%s\" not found in properties";
   private static String resolvePart(final Properties props, final String part) {
     final String result;
 
     final Matcher partMatcher = ResolvablePattern.matcher(part);
     if (partMatcher.matches() && partMatcher.groupCount() == 1) {
-      final String key = partMatcher.group(0);
+      final String key = partMatcher.group(1);
       final Optional<String> valueOpt = Optional.ofNullable(props.getProperty(key));
       result = valueOpt.orElseThrow(() -> new IllegalArgumentException(String.format(UnresolvableErrMsg, part, key)));
     } else {

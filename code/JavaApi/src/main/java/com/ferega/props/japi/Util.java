@@ -24,7 +24,7 @@ final class Util {
       props.load(fis);
       return props;
     } catch (Exception e) {
-      throw new RuntimeException(String.format("An error occured while trying to read properties from file %s", file.getAbsolutePath()), e);
+      throw new IllegalArgumentException(String.format("An error occured while trying to read properties from file %s", file.getAbsolutePath()), e);
     }
   }
 
