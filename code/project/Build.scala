@@ -13,7 +13,7 @@ trait Default {
     EclipsePlugin.settings ++
     GraphPlugin.graphSettings ++ Seq(
       organization := "com.ferega.props",
-      version      := "0.0.1",
+      version      := "0.0.2",
       scalaVersion := "2.11.1"
     )
 
@@ -73,7 +73,7 @@ trait Default {
     homepage                := Some(url("https://github.com/tferega/PropsLoader/")),
     credentials             += Credentials(Path.userHome / ".config" / "tferega.credentials"),
     startYear               := Some(2014),
-    scmInfo                 := Some(ScmInfo(url("https://github.com/tferega/PropsLoader/tree/0.0.1"), "scm:git:https://github.com/tferega/PropsLoader.git")),
+    scmInfo                 := Some(ScmInfo(url("https://github.com/tferega/PropsLoader/tree/0.0.2"), "scm:git:https://github.com/tferega/PropsLoader.git")),
     pomExtra                ~= (_ ++ {Developers.toXml})
   )
 }
