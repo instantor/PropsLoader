@@ -9,7 +9,8 @@ import org.junit.runners.Suite;
   OrElseOptTest.class,
   PropsLoaderTest.class,
   PropsLoadingTest.class,
-  PropsPathTest.class
+  PropsPathTest.class,
+  PropsToMapTest.class
 })
 
 public class JApiSuite {

@@ -2,9 +2,7 @@ package com.ferega.props.japi;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.Properties;
+import java.util.*;
 
 final class Util {
   public static File createFile(final File base, final String ... path) {
@@ -51,5 +49,13 @@ final class Util {
     }
 
     return result;
+  }
+
+  public static Map<String, String> propsToMap(Properties props) {
+    final Map<String, String> map = new HashMap<>();
+    for (final String name: props.stringPropertyNames()) {
+      map.put(name, props.getProperty(name));
+    }
+    return map;
   }
 }

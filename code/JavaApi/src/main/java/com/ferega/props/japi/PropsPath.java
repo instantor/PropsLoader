@@ -57,7 +57,9 @@ public class PropsPath {
 
   public File resolve(final Properties props) {
     final String resolvedBase = resolvePart(props, this.base);
-    final String[] resolvedPartList = Arrays.stream(this.partList).map(part -> resolvePart(props, part)).toArray(String[]::new);
+    final String[] resolvedPartList = Arrays.stream(this.partList)
+        .map(part -> resolvePart(props, part))
+        .toArray(String[]::new);
     return Util.createFile(new File(resolvedBase), resolvedPartList);
   }
 }
