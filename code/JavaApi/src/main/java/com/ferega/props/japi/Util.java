@@ -5,7 +5,7 @@ import java.io.FileInputStream;
 import java.util.*;
 
 final class Util {
-  public static File createFile(final File base, final String ... path) {
+  public static File constructFile(final File base, final String ... path) {
     final File result;
 
     final int len = path.length;
@@ -14,10 +14,29 @@ final class Util {
     } else {
       final String head = path[0];
       final String[] tail = Arrays.copyOfRange(path, 1, len);
-      result = createFile(new File(base, head), tail);
+      result = constructFile(new File(base, head), tail);
     }
 
     return result;
+  }
+
+  public static String[] deconstructFile(File file) {
+    final List<String> partList = new ArrayList<String>();
+    File remainingFile = file;
+    boolean end = false;
+
+    while (!end) {
+      final File parentFile = remainingFile.getParentFile();
+      final String name = (parentFile==null) ? remainingFile.toString() : remainingFile.getName();
+
+      if (!name.isEmpty()) {
+        partList.add(0, name);
+      }
+      remainingFile = parentFile;
+      end = (parentFile==null);
+    }
+
+    return partList.toArray(new String[] {});
   }
 
   public static Properties loadPropsFromFile(final File file) {

@@ -43,6 +43,22 @@ public class PropsPath {
     );
   }
 
+  public static PropsPath path(final String path) {
+    return path(new File(path));
+  }
+
+  public static PropsPath path(final File path) {
+    final String[] partList = Util.deconstructFile(path);
+    final int len = partList.length;
+    if (len == 0) {
+      throw new IllegalArgumentException("Path must have at least one part!");
+    }
+
+    final String head = partList[0];
+    final String[] tail = Arrays.copyOfRange(partList, 1, len);
+    return new PropsPath(head, tail);
+  }
+
   public String getBase() {
     return this.base;
   }
@@ -52,7 +68,7 @@ public class PropsPath {
   }
 
   public File toFile() {
-    return Util.createFile(new File(this.base), this.partList);
+    return Util.constructFile(new File(this.base), this.partList);
   }
 
   public File resolve(final Properties props) {
@@ -60,6 +76,6 @@ public class PropsPath {
     final String[] resolvedPartList = Arrays.stream(this.partList)
         .map(part -> resolvePart(props, part))
         .toArray(String[]::new);
-    return Util.createFile(new File(resolvedBase), resolvedPartList);
+    return Util.constructFile(new File(resolvedBase), resolvedPartList);
   }
 }
