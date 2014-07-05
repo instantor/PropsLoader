@@ -12,6 +12,8 @@ import org.junit.runners.JUnit4;
 
 @RunWith(JUnit4.class)
 public class PropsPathTest {
+  private static final String prefix = "prefix_";
+  private static final String suffix = "_suffix";
   private static final String path1 = "path1";
   private static final String path2 = "path2";
   private static final String path3 = "path3";
@@ -51,5 +53,26 @@ public class PropsPathTest {
   @Test(expected = IllegalArgumentException.class)
   public void resolveFail() throws IOException {
     new PropsPath(path1, "$"+path2+"$", path3).resolve(props);
+  }
+
+  @Test
+  public void resolvePrefix() throws IOException {
+    final File expected    = new File(prefix + path1Resolved);
+    final PropsPath actual = new PropsPath(prefix + "$" + path1 + "$");
+    assertEquals(expected.getCanonicalPath(), actual.resolve(props).getCanonicalPath());
+  }
+
+  @Test
+  public void resolveSuffix() throws IOException {
+    final File expected    = new File(path1Resolved + suffix);
+    final PropsPath actual = new PropsPath("$" + path1 + "$" + suffix);
+    assertEquals(expected.getCanonicalPath(), actual.resolve(props).getCanonicalPath());
+  }
+
+  @Test
+  public void resolvePrefixAndSuffix() throws IOException {
+    final File expected    = new File(prefix + path1Resolved + suffix);
+    final PropsPath actual = new PropsPath(prefix + "$" + path1 + "$" + suffix);
+    assertEquals(expected.getCanonicalPath(), actual.resolve(props).getCanonicalPath());
   }
 }
