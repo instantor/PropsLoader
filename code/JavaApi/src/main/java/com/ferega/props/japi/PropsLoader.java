@@ -1,5 +1,7 @@
 package com.ferega.props.japi;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -36,17 +38,11 @@ public class PropsLoader {
   public PropsLoader(
       final boolean useSystemProps,
       final PropsPath ... resolvablePathList) throws IOException {
+    final Properties sysProps = System.getProperties();
     final Stream<PropsPath> pathStream = Arrays.stream(resolvablePathList);
-    final Stream<File> fileStream;
+    final Stream<File> fileStream = pathStream.map(resolvablePath -> resolvablePath.resolve(sysProps));
 
-    if (useSystemProps) {
-      this.sysProps = Optional.of(System.getProperties());
-      fileStream = pathStream.map(resolvablePath -> resolvablePath.resolve(this.sysProps.get()));
-    } else {
-      this.sysProps = Optional.empty();
-      fileStream = pathStream.map(resolvablePath -> resolvablePath.toFile());
-    }
-
+    this.sysProps = (useSystemProps) ? Optional.of(sysProps) : Optional.empty();
     this.filePropsList = fileStream
         .map(file -> Util.loadPropsFromFile(file))
         .collect(Collectors.toList());
@@ -66,7 +62,7 @@ public class PropsLoader {
     return Util.orElseOpt(sysVal, fileVal);
   }
 
-  public Map<String, String> getMap() {
+  public Map<String, String> toMap() {
     if (memoizedMap != null) {
       return memoizedMap;
     } else {
@@ -75,11 +71,24 @@ public class PropsLoader {
     }
   }
 
+  public Properties toProps() {
+    final Properties props = new Properties();
+    props.putAll(toMap());
+    return props;
+  }
+
+  public ByteArrayInputStream toInputStream() throws IOException {
+    final ByteArrayOutputStream bos = new ByteArrayOutputStream();
+    toProps().store(bos, "Stored by PropsLoader");
+    final ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
+    return bis;
+  }
+
   public Map<String, String> select(final String prefix) {
     final String fullPrefix = prefix.endsWith(".") ? prefix : prefix + ".";
 
     final Map<String, String> selection = new HashMap<>();
-    for (final Map.Entry<String, String> entry: getMap().entrySet()) {
+    for (final Map.Entry<String, String> entry: toMap().entrySet()) {
       final String key = entry.getKey();
       if (key.startsWith(fullPrefix)) {
         final String val = entry.getValue();

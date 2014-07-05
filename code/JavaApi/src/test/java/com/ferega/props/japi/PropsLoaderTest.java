@@ -121,7 +121,7 @@ public class PropsLoaderTest {
   @Test(expected = UnsupportedOperationException.class)
   public void mapModification() throws IOException {
     final PropsLoader pl = new PropsLoader(true);
-    final Map<String, String> map = pl.getMap();
+    final Map<String, String> map = pl.toMap();
     map.put("asdf", "zxcv");
   }
 
@@ -133,7 +133,7 @@ public class PropsLoaderTest {
     fos.close();
 
     final PropsLoader pl = new PropsLoader(true, new PropsPath(file.getCanonicalPath()));
-    final Map<String, String> map = pl.getMap();
+    final Map<String, String> map = pl.toMap();
 
     final String expected1 = sysVal1;
     final String actual1   = map.get(sysKey1);
