@@ -13,19 +13,19 @@ Getting PropsLoader
 PropsLoader is published to Sonatype OSS and Maven Central.
 
 * Group id: *com.ferega.props*
-* Latest version is 0.0.2.
+* Latest version is 0.0.3.
 
 #### Java 8 ####
 
 * Artifact id: *propsloader-javaapi*
 
-`libraryDependencies += "com.ferega.props" % "propsloader-javaapi" % "0.0.2"`
+`libraryDependencies += "com.ferega.props" % "propsloader-javaapi" % "0.0.3"`
 
 #### Scala ####
 
 * Artifacy id: *propsloader-scalaapi*
 * 
-`libraryDependencies += "com.ferega.props" %% "propsloader-scalaapi" % "0.0.2"`
+`libraryDependencies += "com.ferega.props" %% "propsloader-scalaapi" % "0.0.3"`
 
 Java Api
 --------
