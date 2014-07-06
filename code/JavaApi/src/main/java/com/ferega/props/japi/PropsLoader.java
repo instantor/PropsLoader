@@ -9,6 +9,13 @@ import java.util.stream.Collectors;
 public class PropsLoader {
   private final Map<String, String> propsMap;
 
+  private static List<Properties> resolvePropsList(final Properties resolver, final PropsPath ... resolvablePathList) {
+      return Arrays.stream(resolvablePathList)
+          .map(resolvablePath -> resolvablePath.resolve(resolver))
+          .map(file -> Util.loadPropsFromFile(file))
+          .collect(Collectors.toList());
+  }
+
   private static Map<String, String> collapseMap(final List<Properties> propsList) {
     final Map<String, String> map = new HashMap<>();
     final ListIterator<Properties> li = propsList.listIterator();
@@ -24,13 +31,9 @@ public class PropsLoader {
 
   public PropsLoader(
       final boolean useSystemProps,
-      final PropsPath ... resolvablePathList) throws IOException {
+      final PropsPath ... resolvablePathList) {
     final Properties sysProps = System.getProperties();
-    final List<Properties> filePropsList =
-        Arrays.stream(resolvablePathList)
-            .map(resolvablePath -> resolvablePath.resolve(sysProps))
-            .map(file -> Util.loadPropsFromFile(file))
-            .collect(Collectors.toList());
+    final List<Properties> filePropsList = resolvePropsList(sysProps, resolvablePathList);
 
     final List<Properties> allPropsList = new ArrayList<Properties>();
     allPropsList.addAll(filePropsList);
@@ -39,6 +42,22 @@ public class PropsLoader {
     }
 
     this.propsMap = Collections.unmodifiableMap(collapseMap(allPropsList));
+  }
+
+  public PropsLoader addPathList(final PropsPath ... newResolvablePathList) {
+    if (newResolvablePathList.length != 0) {
+      final Map<String, String> allMap = new HashMap<>();
+
+      final Properties sysProps = System.getProperties();
+      final List<Properties> filePropsList = resolvePropsList(sysProps, newResolvablePathList);
+      final Map<String, String> newPropsMap = collapseMap(filePropsList);
+
+      allMap.putAll(this.propsMap);
+      allMap.putAll(newPropsMap);
+      return new PropsLoader(allMap);
+    } else {
+      return this;
+    }
   }
 
   public String get(final String key) {

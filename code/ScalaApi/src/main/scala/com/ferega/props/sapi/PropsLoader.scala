@@ -24,6 +24,9 @@ class PropsLoader private (baseLoader: japi.PropsLoader) extends DefaultConverte
   def this(propsMap: Map[String, String]) =
     this(new japi.PropsLoader(propsMap))
 
+  def addPathList(newResolvablePathList: japi.PropsPath*): PropsLoader =
+    new PropsLoader(baseLoader.addPathList(newResolvablePathList: _*));
+
   def opt[T](key: String)(implicit ev: ValueConverter[T]): Option[T] = {
     val valueOpt = optionalToOption(baseLoader.opt(key))
     valueOpt map { value =>
