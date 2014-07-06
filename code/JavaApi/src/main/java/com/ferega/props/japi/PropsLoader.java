@@ -56,10 +56,42 @@ public class PropsLoader {
     }
   }
 
+  public int getAsInt(final String key) {
+    return Integer.parseInt(get(key));
+  }
+
+  public long getAsLong(final String key) {
+    return Long.parseLong(get(key));
+  }
+
+  public boolean getAsBoolean(final String key) {
+    return Boolean.parseBoolean(get(key));
+  }
+
+  public double getAsDouble(final String key) {
+    return Double.parseDouble(get(key));
+  }
+
   public Optional<String> opt(final String key) {
     final Optional<String> sysVal = resolve(this.sysProps, key);
     final Optional<String> fileVal = resolve(this.filePropsList, key);
     return Util.orElseOpt(sysVal, fileVal);
+  }
+
+  public Optional<Integer> optAsInt(final String key) {
+    return opt(key).map(Integer::parseInt);
+  }
+
+  public Optional<Long> optAsLong(final String key) {
+    return opt(key).map(Long::parseLong);
+  }
+
+  public Optional<Boolean> optAsBoolean(final String key) {
+    return opt(key).map(Boolean::parseBoolean);
+  }
+
+  public Optional<Double> optAsDouble(final String key) {
+    return opt(key).map(Double::parseDouble);
   }
 
   public Map<String, String> toMap() {
