@@ -157,20 +157,20 @@ public class PropsLoaderTest {
   @Test
   public final void selection() throws IOException {
     final PropsLoader pl = new PropsLoader(true);
-    final Map<String, String> map = pl.select("user");
+    final PropsLoader selectedPL = pl.select("user");
 
     final String expected = sysVal1;
-    final String actual   = map.get("home");
+    final String actual   = selectedPL.get("home");
     assertEquals(expected, actual);
   }
 
   @Test
   public final void selectionWithDot() throws IOException {
     final PropsLoader pl = new PropsLoader(true);
-    final Map<String, String> map = pl.select("user.");
+    final PropsLoader selectedPL = pl.select("user.");
 
     final String expected = sysVal1;
-    final String actual   = map.get("home");
+    final String actual   = selectedPL.get("home");
     assertEquals(expected, actual);
   }
 }

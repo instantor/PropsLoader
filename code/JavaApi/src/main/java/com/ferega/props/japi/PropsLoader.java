@@ -2,50 +2,43 @@ package com.ferega.props.japi;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class PropsLoader {
-  private final Optional<Properties> sysProps;
-  private final List<Properties> filePropsList;
-  private Map<String, String> memoizedMap = null;
+  private final Map<String, String> propsMap;
 
-  private static Optional<String> resolve(final Optional<Properties> pOpt, final String key) {
-    return pOpt.flatMap(p -> Optional.ofNullable(p.getProperty(key)));
-  }
-
-  private static Optional<String> resolve(final List<Properties> sOpt, final String key) {
-    return sOpt.stream()
-      .map(s -> Optional.ofNullable(s.getProperty(key)))
-      .filter(o -> o.isPresent())
-      .map(o -> o.get())
-      .findFirst();
-  }
-
-  private Map<String, String> calculateMap() {
+  private static Map<String, String> collapseMap(final List<Properties> propsList) {
     final Map<String, String> map = new HashMap<>();
-    final ListIterator<Properties> li = filePropsList.listIterator(filePropsList.size());
-    while (li.hasPrevious()) {
-      map.putAll(Util.propsToMap(li.previous()));
+    final ListIterator<Properties> li = propsList.listIterator();
+    while (li.hasNext()) {
+      map.putAll(Util.propsToMap(li.next()));
     }
-    sysProps.ifPresent(props -> map.putAll(Util.propsToMap(props)));
-    return Collections.unmodifiableMap(map);
+    return map;
+  }
+
+  public PropsLoader(final Map<String, String> propsMap) {
+    this.propsMap = Collections.unmodifiableMap(propsMap);
   }
 
   public PropsLoader(
       final boolean useSystemProps,
       final PropsPath ... resolvablePathList) throws IOException {
     final Properties sysProps = System.getProperties();
-    final Stream<PropsPath> pathStream = Arrays.stream(resolvablePathList);
-    final Stream<File> fileStream = pathStream.map(resolvablePath -> resolvablePath.resolve(sysProps));
+    final List<Properties> filePropsList =
+        Arrays.stream(resolvablePathList)
+            .map(resolvablePath -> resolvablePath.resolve(sysProps))
+            .map(file -> Util.loadPropsFromFile(file))
+            .collect(Collectors.toList());
 
-    this.sysProps = (useSystemProps) ? Optional.of(sysProps) : Optional.empty();
-    this.filePropsList = fileStream
-        .map(file -> Util.loadPropsFromFile(file))
-        .collect(Collectors.toList());
+    final List<Properties> allPropsList = new ArrayList<Properties>();
+    allPropsList.addAll(filePropsList);
+    if (useSystemProps) {
+      allPropsList.add(sysProps);
+    }
+
+    this.propsMap = Collections.unmodifiableMap(collapseMap(allPropsList));
   }
 
   public String get(final String key) {
@@ -73,9 +66,7 @@ public class PropsLoader {
   }
 
   public Optional<String> opt(final String key) {
-    final Optional<String> sysVal = resolve(this.sysProps, key);
-    final Optional<String> fileVal = resolve(this.filePropsList, key);
-    return Util.orElseOpt(sysVal, fileVal);
+    return Optional.ofNullable(propsMap.get(key));
   }
 
   public Optional<Integer> optAsInt(final String key) {
@@ -95,12 +86,7 @@ public class PropsLoader {
   }
 
   public Map<String, String> toMap() {
-    if (memoizedMap != null) {
-      return memoizedMap;
-    } else {
-      memoizedMap = calculateMap();
-      return memoizedMap;
-    }
+    return propsMap;
   }
 
   public Properties toProps() {
@@ -116,7 +102,7 @@ public class PropsLoader {
     return bis;
   }
 
-  public Map<String, String> select(final String prefix) {
+  public PropsLoader select(final String prefix) {
     final String fullPrefix = prefix.endsWith(".") ? prefix : prefix + ".";
 
     final Map<String, String> selection = new HashMap<>();
@@ -127,6 +113,6 @@ public class PropsLoader {
         selection.put(key.substring(fullPrefix.length()), val);
       }
     }
-    return selection;
+    return new PropsLoader(selection);
   }
 }
