@@ -13,7 +13,7 @@ trait Default {
     EclipsePlugin.settings ++
     GraphPlugin.graphSettings ++ Seq(
       organization := "com.ferega.props",
-      version      := "0.0.4",
+      version      := "0.0.5",
       scalaVersion := "2.11.1"
     )
 
@@ -55,12 +55,12 @@ trait Default {
         "-Xlint:all"
       )
     )
-    
+
   val publishing = Seq(
     publishTo := Some(
-      if (version.value endsWith "SNAPSHOT") {
+      if (version.value endsWith "-SNAPSHOT") {
         Opts.resolver.sonatypeSnapshots
-      } else { 
+      } else {
         Opts.resolver.sonatypeStaging
       }
     ),
@@ -73,7 +73,7 @@ trait Default {
     homepage                := Some(url("https://github.com/tferega/PropsLoader/")),
     credentials             += Credentials(Path.userHome / ".config" / "tferega.credentials"),
     startYear               := Some(2014),
-    scmInfo                 := Some(ScmInfo(url("https://github.com/tferega/PropsLoader/tree/0.0.2"), "scm:git:https://github.com/tferega/PropsLoader.git")),
+    scmInfo                 := Some(ScmInfo(url("https://github.com/tferega/PropsLoader/tree/0.0.5"), "scm:git:https://github.com/tferega/PropsLoader.git")),
     pomExtra                ~= (_ ++ {Developers.toXml})
   )
 }
@@ -81,9 +81,9 @@ trait Default {
 // ----------------------------------------------------------------------------
 
 trait Dependencies {
-  def reflectApi(sv: String) = "org.scala-lang" % "scala-reflect" % sv
-  val jUnitInterface = "com.novocode"   %  "junit-interface" % "0.11-RC1" % "test"
-  val scalaTest      = "org.scalatest"  %% "scalatest"       % "2.2.0"    % "test"
+  lazy val reflectApi = Def.setting { "org.scala-lang" % "scala-reflect" % scalaVersion.value }
+  lazy val jUnitInterface = "com.novocode"  %  "junit-interface" % "0.11-RC1" % "test"
+  lazy val scalaTest      = "org.scalatest" %% "scalatest"       % "2.2.0"    % "test"
 }
 
 // ----------------------------------------------------------------------------
@@ -103,7 +103,7 @@ object PropsLoaderBuild extends Build with Default with Dependencies {
     file("ScalaApi"),
     settings = scala ++ publishing ++ Seq(
       name := "PropsLoader-ScalaApi",
-      libraryDependencies ++= Seq(reflectApi(scalaVersion.value), scalaTest)
+      libraryDependencies ++= Seq(reflectApi.value, scalaTest)
     )
   ) dependsOn(javaApi)
 }
