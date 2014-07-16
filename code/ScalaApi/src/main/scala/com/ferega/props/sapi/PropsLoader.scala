@@ -42,14 +42,23 @@ class PropsLoader private (baseLoader: japi.PropsLoader) extends DefaultConverte
   def get[T](key: String)(implicit ev: ValueConverter[T]): T =
     opt[T](key)(ev).getOrElse(throw new IllegalArgumentException(s"""Key "$key" not found in any of defined properties"""))
 
-  lazy val map: Map[String, String] =
+  def map: Map[String, String] =
     baseLoader.toMap.toMap;
 
-  lazy val toProps: Properties =
+  def toProps: Properties =
     baseLoader.toProps
 
-  lazy val toInputStream: ByteArrayInputStream =
+  def toInputStream: ByteArrayInputStream =
     baseLoader.toInputStream
+
+  def toByteArray =
+    baseLoader.toByteArray
+
+  def toString(encoding: String) =
+    baseLoader.toString(encoding)
+
+  override def toString =
+    baseLoader.toString
 
   def select(prefix: String): PropsLoader =
     new PropsLoader(baseLoader.select(prefix))
