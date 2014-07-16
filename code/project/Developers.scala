@@ -1,6 +1,7 @@
 object Developers {
   lazy val members = Map(
-    "tferega" -> "Tomo Ferega"
+    "tferega" -> "Tomo Ferega",
+    "melezov" -> "Marko Elezovic"
   )
 
   def toXml =
