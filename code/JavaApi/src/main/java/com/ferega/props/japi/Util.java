@@ -50,7 +50,7 @@ final class Util {
   }
 
   @SafeVarargs
-  public static Optional<String> orElseOpt(final Optional<String> ... optList) {
+  public static Optional<String> orElseOpt(final Optional<String>... optList) {
     final Optional<String> result;
 
     final int len = optList.length;
