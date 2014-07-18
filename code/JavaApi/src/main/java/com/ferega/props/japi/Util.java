@@ -5,7 +5,7 @@ import java.nio.file.Files;
 import java.util.*;
 
 final class Util {
-  public static File constructFile(final File base, final String ... path) {
+  public static File constructFile(final File base, final String... path) {
     final File result;
 
     final int len = path.length;
@@ -20,14 +20,14 @@ final class Util {
     return result;
   }
 
-  public static String[] deconstructFile(File file) {
+  public static String[] deconstructFile(final File file) {
     final List<String> partList = new ArrayList<String>();
     File remainingFile = file;
     boolean end = false;
 
     while (!end) {
       final File parentFile = remainingFile.getParentFile();
-      final String name = (parentFile==null) ? remainingFile.toString() : remainingFile.getName();
+      final String name = (parentFile == null) ? remainingFile.toString() : remainingFile.getName();
 
       if (!name.isEmpty()) {
         partList.add(0, name);
@@ -36,7 +36,7 @@ final class Util {
       end = (parentFile==null);
     }
 
-    return partList.toArray(new String[] {});
+    return partList.toArray(new String[partList.size()]);
   }
 
   public static byte[] loadFile(final File file, final boolean autoExt) {
@@ -47,11 +47,10 @@ final class Util {
         final String name = file.getName();
         final File[] foundFileList = parent.listFiles((p, n) -> n.startsWith(name));
 
-        if (foundFileList.length > 0) {
-          foundFile = foundFileList[0];
-        } else {
-          throw new IllegalArgumentException(String.format("File with prefix \"%s\" not found!", name));
-        }
+        final int candidates = foundFileList.length;
+        if (candidates == 0) throw new IllegalArgumentException(String.format("File with prefix \"%s\" not found!", name));
+        if (candidates > 1) throw new IllegalArgumentException(String.format("Ambiguous resolution, more than one file with prefix \"%s\" was found!", name));
+        foundFile = foundFileList[0];
       } else {
         foundFile = file;
       }

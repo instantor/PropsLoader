@@ -12,8 +12,7 @@ public class ResolvablePath {
   private final String base;
   private final String[] partList;
 
-  private final static Pattern ResolvablePattern = Pattern.compile("^(.*)\\$([-a-zA-Z0-9_.]+)\\$(.*)$");
-  private final static String UnresolvableErrMsg = "An error occured while resolving path part \"%s\": key \"%s\" not found in properties";
+  private final static Pattern ResolvablePattern = Pattern.compile("^(.*)\\$([-\\.\\w]+)\\$(.*)$");
   private static String resolvePart(final Properties props, final String part) {
     final String result;
 
@@ -23,7 +22,8 @@ public class ResolvablePath {
       final String key    = partMatcher.group(2);
       final String suffix = partMatcher.group(3);
       final Optional<String> valueOpt = Optional.ofNullable(props.getProperty(key));
-      final String value = valueOpt.orElseThrow(() -> new IllegalArgumentException(String.format(UnresolvableErrMsg, part, key)));
+      final String value = valueOpt.orElseThrow(() -> new IllegalArgumentException(String.format(
+              "An error occured while resolving path part \"%s\": key \"%s\" not found in properties", part, key)));
       result = prefix + value + suffix;
     } else {
       result = part;
@@ -75,7 +75,11 @@ public class ResolvablePath {
   }
 
   public File resolve(final Properties props) {
-    final String resolvedBase = resolvePart(props, this.base);
+    final String expandedBase = this.base.startsWith("~")
+            ? "$user.home$" + this.base.substring(1)
+            : this.base;
+
+    final String resolvedBase = resolvePart(props, expandedBase);
     final String[] resolvedPartList = Arrays.stream(this.partList)
         .map(part -> resolvePart(props, part))
         .toArray(String[]::new);
