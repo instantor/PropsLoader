@@ -1,7 +1,7 @@
 package com.ferega.props.japi;
 
 import java.io.File;
-import java.io.FileInputStream;
+import java.nio.file.Files;
 import java.util.*;
 
 final class Util {
@@ -39,35 +39,26 @@ final class Util {
     return partList.toArray(new String[] {});
   }
 
-  public static Properties loadPropsFromFile(final File file) {
-    try (final FileInputStream fis = new FileInputStream(file)) {
-      final Properties props = new Properties();
-      props.load(fis);
-      return props;
-    } catch (Exception e) {
-      throw new IllegalArgumentException(String.format("An error occured while trying to read properties from file %s", file.getAbsolutePath()), e);
-    }
-  }
+  public static byte[] loadFile(final File file, final boolean autoExt) {
+    try {
+      final File foundFile;
+      if (autoExt) {
+        final File parent = file.getParentFile();
+        final String name = file.getName();
+        final File[] foundFileList = parent.listFiles((p, n) -> n.startsWith(name));
 
-  @SafeVarargs
-  public static Optional<String> orElseOpt(final Optional<String>... optList) {
-    final Optional<String> result;
-
-    final int len = optList.length;
-    if (len == 0) {
-      result = Optional.empty();
-    } else {
-      final Optional<String> head = optList[0];
-      final Optional<String>[] tail = Arrays.copyOfRange(optList, 1, len);
-
-      if (head.isPresent()) {
-        result = head;
+        if (foundFileList.length > 0) {
+          foundFile = foundFileList[0];
+        } else {
+          throw new IllegalArgumentException(String.format("File with prefix \"%s\" not found!", name));
+        }
       } else {
-        result = orElseOpt(tail);
+        foundFile = file;
       }
+      return Files.readAllBytes(foundFile.toPath());
+    } catch (Exception e) {
+      throw new IllegalArgumentException(String.format("An error occured while trying to reading file %s", file.getAbsolutePath()), e);
     }
-
-    return result;
   }
 
   public static Map<String, String> propsToMap(Properties props) {

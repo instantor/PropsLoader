@@ -8,7 +8,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-public class PropsPath {
+public class ResolvablePath {
   private final String base;
   private final String[] partList;
 
@@ -32,12 +32,12 @@ public class PropsPath {
     return result;
   }
 
-  public PropsPath(final String base, final String ... partList) {
+  public ResolvablePath(final String base, final String ... partList) {
     this.base     = base;
     this.partList = partList;
   }
 
-  public PropsPath(final PropsPath base, final String ... newPartList) {
+  public ResolvablePath(final ResolvablePath base, final String ... newPartList) {
     this(base.getBase(),
         Stream.concat(
             Arrays.stream(base.partList),
@@ -46,11 +46,11 @@ public class PropsPath {
     );
   }
 
-  public static PropsPath path(final String path) {
+  public static ResolvablePath path(final String path) {
     return path(new File(path));
   }
 
-  public static PropsPath path(final File path) {
+  public static ResolvablePath path(final File path) {
     final String[] partList = Util.deconstructFile(path);
     final int len = partList.length;
     if (len == 0) {
@@ -59,7 +59,7 @@ public class PropsPath {
 
     final String head = partList[0];
     final String[] tail = Arrays.copyOfRange(partList, 1, len);
-    return new PropsPath(head, tail);
+    return new ResolvablePath(head, tail);
   }
 
   public String getBase() {
@@ -80,5 +80,9 @@ public class PropsPath {
         .map(part -> resolvePart(props, part))
         .toArray(String[]::new);
     return Util.constructFile(new File(resolvedBase), resolvedPartList);
+  }
+
+  public File resolve() {
+    return resolve(System.getProperties());
   }
 }
