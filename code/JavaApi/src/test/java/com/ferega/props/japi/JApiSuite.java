@@ -6,9 +6,8 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
   FileConstructionTest.class,
-  OrElseOptTest.class,
+  PropsLoaderFactoryTest.class,
   PropsLoaderTest.class,
-  PropsLoadingTest.class,
   PropsPathTest.class,
   PropsToMapTest.class
 })

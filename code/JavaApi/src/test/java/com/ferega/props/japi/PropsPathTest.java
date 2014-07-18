@@ -25,54 +25,54 @@ public class PropsPathTest {
   @Test
   public void fileOne() throws IOException {
     final File expected    = new File(path1);
-    final PropsPath actual = new PropsPath(path1);
+    final ResolvablePath actual = new ResolvablePath(path1);
     assertEquals(expected.getCanonicalPath(), actual.toFile().getCanonicalPath());
   }
 
   @Test
   public void fileMany() throws IOException {
     final File expected    = new File(new File(new File(path1), path2), path3);
-    final PropsPath actual = new PropsPath(path1, path2, path3);
+    final ResolvablePath actual = new ResolvablePath(path1, path2, path3);
     assertEquals(expected.getCanonicalPath(), actual.toFile().getCanonicalPath());
   }
 
   @Test
   public void resolveSuccess() throws IOException {
     final File expected    = new File(new File(new File(path1Resolved), path2), path3);
-    final PropsPath actual = new PropsPath("$"+path1+"$", path2, path3);
+    final ResolvablePath actual = new ResolvablePath("$"+path1+"$", path2, path3);
     assertEquals(expected.getCanonicalPath(), actual.resolve(props).getCanonicalPath());
   }
 
   @Test
   public void resolveNothing() throws IOException {
     final File expected    = new File(new File(new File(path1), path2), path3);
-    final PropsPath actual = new PropsPath(path1, path2, path3);
+    final ResolvablePath actual = new ResolvablePath(path1, path2, path3);
     assertEquals(expected.getCanonicalPath(), actual.resolve(props).getCanonicalPath());
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void resolveFail() throws IOException {
-    new PropsPath(path1, "$"+path2+"$", path3).resolve(props);
+    new ResolvablePath(path1, "$"+path2+"$", path3).resolve(props);
   }
 
   @Test
   public void resolvePrefix() throws IOException {
     final File expected    = new File(prefix + path1Resolved);
-    final PropsPath actual = new PropsPath(prefix + "$" + path1 + "$");
+    final ResolvablePath actual = new ResolvablePath(prefix + "$" + path1 + "$");
     assertEquals(expected.getCanonicalPath(), actual.resolve(props).getCanonicalPath());
   }
 
   @Test
   public void resolveSuffix() throws IOException {
     final File expected    = new File(path1Resolved + suffix);
-    final PropsPath actual = new PropsPath("$" + path1 + "$" + suffix);
+    final ResolvablePath actual = new ResolvablePath("$" + path1 + "$" + suffix);
     assertEquals(expected.getCanonicalPath(), actual.resolve(props).getCanonicalPath());
   }
 
   @Test
   public void resolvePrefixAndSuffix() throws IOException {
     final File expected    = new File(prefix + path1Resolved + suffix);
-    final PropsPath actual = new PropsPath(prefix + "$" + path1 + "$" + suffix);
+    final ResolvablePath actual = new ResolvablePath(prefix + "$" + path1 + "$" + suffix);
     assertEquals(expected.getCanonicalPath(), actual.resolve(props).getCanonicalPath());
   }
 }
