@@ -1,16 +1,13 @@
 package com.ferega.props.japi;
 
 import static org.junit.Assert.assertEquals;
+
+import java.io.File;
 import java.io.IOException;
-import java.io.FileWriter;
 import java.nio.file.NoSuchFileException;
-import java.util.NoSuchElementException;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.junit.Rule;
-import java.io.File;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
@@ -19,7 +16,8 @@ public class LoadFileTest {
   @Rule
   public TemporaryFolder testFolder = new TemporaryFolder();
 
-  public static final String Ext = ".txt";
+  public static final String Ext1 = ".txt";
+  public static final String Ext2 = ".rtf";
   public static final String MissingFilename = "missing";
   public static final String ExistingFilename = "existing";
   public static final String ExistingContent = "Existing content!";
@@ -30,32 +28,28 @@ public class LoadFileTest {
 
   @Test(expected = NoSuchFileException.class)
   public void loadMissingExplicit() throws Throwable {
-    final File file = getFile(MissingFilename);
     try {
-      Util.loadFile(file, false);
-    } catch (Exception e) {
+      final File actualFile = getFile(MissingFilename + Ext1);
+      Util.loadFile(actualFile, false);
+    } catch (final Exception e) {
       throw e.getCause();
     }
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void loadMissingAuto() throws Throwable {
-    final File file = getFile(MissingFilename + Ext);
     try {
-      Util.loadFile(file, true);
-    } catch (Exception e) {
+      final File actualFile = getFile(MissingFilename);
+      Util.loadFile(actualFile, true);
+    } catch (final Exception e) {
       throw e.getCause();
     }
   }
 
   @Test
   public void loadExistingExplicit() throws IOException {
-    final File file = getFile(ExistingFilename + Ext);
-    final FileWriter fw = new FileWriter(file);
-    fw.write(ExistingContent);
-    fw.close();
-
-    final File actualFile = getFile(ExistingFilename);
+    TestUtil.writeFile(getFile(ExistingFilename + Ext1), ExistingContent);
+    final File actualFile = getFile(ExistingFilename + Ext1);
 
     final String expected = ExistingContent;
     final String actual   = new String(Util.loadFile(actualFile, false));
@@ -64,14 +58,23 @@ public class LoadFileTest {
 
   @Test
   public void loadExistingAuto() throws IOException {
-//    final File file = getFile(ExistingFilename + Ext);
-//    final FileWriter fw = new FileWriter(file);
-//    fw.write(ExistingContent);
-//    fw.close();
-//
-//    final byte[] body = Util.loadFile(getFile(ExistingFilename), true);
-//    final String expected = ;
-//    final String actual   = new String(body);
-//    assertEquals(expected, actual);
+    TestUtil.writeFile(getFile(ExistingFilename + Ext1), ExistingContent);
+    final File actualFile = getFile(ExistingFilename);
+
+    final String expected = ExistingContent;
+    final String actual   = new String(Util.loadFile(actualFile, true));
+    assertEquals(expected, actual);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void loadAmbiguous() throws Throwable {
+    TestUtil.writeFile(getFile(ExistingFilename + Ext1), ExistingContent);
+    TestUtil.writeFile(getFile(ExistingFilename + Ext2), ExistingContent);
+    try {
+      final File actualFile = getFile(ExistingFilename);
+      Util.loadFile(actualFile, true);
+    } catch (final Exception e) {
+      throw e.getCause();
+    }
   }
 }

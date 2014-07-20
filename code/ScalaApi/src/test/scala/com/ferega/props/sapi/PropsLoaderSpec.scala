@@ -1,3 +1,4 @@
+/*
 package com.ferega.props
 package sapi
 
@@ -59,3 +60,4 @@ class PropsLoaderSpec extends FlatSpec with Matchers {
     pl.get[CustomClass](customKey) should be (customValue)
   }
 }
+*/

@@ -6,10 +6,11 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
   FileConstructionTest.class,
+  LoadFileTest.class,
   PropsLoaderFactoryTest.class,
   PropsLoaderTest.class,
-  PropsPathTest.class,
-  PropsToMapTest.class
+  PropsToMapTest.class,
+  ResolvablePathTest.class
 })
 
 public class JApiSuite {

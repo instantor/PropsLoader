@@ -46,7 +46,6 @@ final class Util {
         final File parent = file.getParentFile();
         final String name = file.getName();
         final File[] foundFileList = parent.listFiles((p, n) -> n.startsWith(name));
-
         final int candidates = foundFileList.length;
         if (candidates == 0) throw new IllegalArgumentException(String.format("File with prefix \"%s\" not found!", name));
         if (candidates > 1) throw new IllegalArgumentException(String.format("Ambiguous resolution, more than one file with prefix \"%s\" was found!", name));
@@ -55,7 +54,7 @@ final class Util {
         foundFile = file;
       }
       return Files.readAllBytes(foundFile.toPath());
-    } catch (Exception e) {
+    } catch (final Exception e) {
       throw new IllegalArgumentException(String.format("An error occured while trying to reading file %s", file.getAbsolutePath()), e);
     }
   }

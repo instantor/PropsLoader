@@ -12,6 +12,7 @@ public class ResolvablePath {
   private final String base;
   private final String[] partList;
 
+  private final static String UserHome = "~";
   private final static Pattern ResolvablePattern = Pattern.compile("^(.*)\\$([-\\.\\w]+)\\$(.*)$");
   private static String resolvePart(final Properties props, final String part) {
     final String result;
@@ -75,8 +76,8 @@ public class ResolvablePath {
   }
 
   public File resolve(final Properties props) {
-    final String expandedBase = this.base.startsWith("~")
-            ? "$user.home$" + this.base.substring(1)
+    final String expandedBase = (UserHome.equals(this.base))
+            ? "$user.home$"
             : this.base;
 
     final String resolvedBase = resolvePart(props, expandedBase);

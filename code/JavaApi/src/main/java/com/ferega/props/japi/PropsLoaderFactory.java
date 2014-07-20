@@ -33,7 +33,7 @@ public class PropsLoaderFactory {
 
   public PropsLoader build() {
     final String resolvablePath = (projectName != null) ? String.format(pathPattern, projectName) : pathPattern;
-    final ResolvablePath path = new ResolvablePath(resolvablePath);
+    final ResolvablePath path = ResolvablePath.path(resolvablePath);
     return new PropsLoader(path, this.autoExt);
   }
 
