@@ -1,5 +1,8 @@
 package com.ferega.props.japi;
 
+import java.util.HashSet;
+
+import java.util.Set;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -35,16 +38,6 @@ public class TestUtil {
     } catch (final IOException e) {
       throw new RuntimeException("Error in tests!", e);
     }
-  }
-
-  static String randomString(final int length) {
-    final Random r = new Random();
-    final StringBuilder sb = new StringBuilder();
-    for (int n = 1; n <= length; n++) {
-      final char c = (char)(r.nextInt(26) + 'A');
-      sb.append(c);
-    }
-    return sb.toString();
   }
 
   static TemporaryFolder createTemp() {

@@ -10,7 +10,8 @@ import org.junit.runners.Suite;
   PropsLoaderFactoryTest.class,
   PropsLoaderTest.class,
   PropsToMapTest.class,
-  ResolvablePathTest.class
+  ResolvablePathTest.class,
+  SelectableMapTest.class
 })
 
 public class JApiSuite {

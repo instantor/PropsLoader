@@ -89,6 +89,10 @@ public class PropsLoader {
     }
   }
 
+  public SelectableMap toSelectableMap() {
+    return new SelectableMap(toMap());
+  }
+
   @Override
   public String toString() {
     return toString("ISO-8859-1");
