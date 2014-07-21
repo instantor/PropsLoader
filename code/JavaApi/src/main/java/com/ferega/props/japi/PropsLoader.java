@@ -4,25 +4,30 @@ import java.io.*;
 import java.util.*;
 
 public class PropsLoader {
-  private static final String ServerAliasPath = "~/.config/global/serverAlias";
+  private static final String DefaultConfig = ".props";
 
   private final File location;
   private final byte[] source;
   private Map<String, String> propsMap;
 
+  public static PropsLoader loadGlobal() {
+    return PropsLoader.load("global", false);
+  }
+
   public static PropsLoader load(final String projectName) {
-    return new PropsLoaderFactory(projectName).build();
+      return load(projectName, true);
+    }
+
+  public static PropsLoader load(final String projectName, final boolean useBranch) {
+    final PropsLoaderFactory propsLoaderFactory = new PropsLoaderFactory(projectName);
+
+    return (useBranch
+      ? propsLoaderFactory
+      : propsLoaderFactory.setPathPattern("~/" + DefaultConfig + "/%1$s/_")).build();
   }
 
   public static String getServerAlias() {
-    try {
-      return new PropsLoaderFactory(null)
-        .setPathPattern(ServerAliasPath)
-        .build().toString();
-    }
-    catch (final Exception e) {
-      throw new IllegalArgumentException("Server alias property was not found at " + ServerAliasPath + ".*", e);
-    }
+    return loadGlobal().resolve("serverAlias").toString();
   }
 
   public PropsLoader(final ResolvablePath resolvablePath, final boolean autoExt) {
@@ -43,7 +48,7 @@ public class PropsLoader {
     } else if (value.startsWith("/")) { // Absolute
       path = ResolvablePath.path(value.substring(1) + "/" + key);
     } else { // From .config
-      path = new ResolvablePath("~", ".config", value, key);
+      path = new ResolvablePath("~", DefaultConfig, value, key);
     }
     return new PropsLoader(path, true);
   }

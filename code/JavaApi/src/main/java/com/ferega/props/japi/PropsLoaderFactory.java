@@ -1,7 +1,7 @@
 package com.ferega.props.japi;
 
 public class PropsLoaderFactory {
-  public static final String DefaultPathPattern = "~/.config/%1$s_$%1$s.branch$/_";
+  public static final String DefaultPathPattern = "~/.props/%1$s_$%1$s.branch$/_";
   public static final boolean DefaultAutoExt    = true;
 
   private final String projectName;
