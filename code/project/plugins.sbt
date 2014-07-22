@@ -1,5 +1,3 @@
-libraryDependencies += "com.ferega.props" % "propsloader-javaapi" % "0.1.1"
-
 // +-------------------------------------------------------------------------------------+
 // | SBT Eclipse (https://github.com/typesafehub/sbteclipse)                             |
 // | Creates .project and .classpath files for easy Eclipse project imports              |
