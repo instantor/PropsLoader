@@ -74,9 +74,7 @@ trait Default {
     pomIncludeRepository    := { _ => false },
     licenses                += ("MIT", url("http://opensource.org/licenses/MIT")),
     homepage                := Some(url("https://github.com/tferega/PropsLoader/")),
-    credentials             ++= Try {
-      Seq(Credentials(PropsLoader.load("PropsLoader", false).resolve("tferega").toFile))
-    } getOrElse(Nil),
+    credentials             += Credentials(Path.userHome / ".config" / "tferega.credentials"),
     startYear               := Some(2014),
     scmInfo                 := Some(ScmInfo(url("https://github.com/tferega/PropsLoader/tree/0.1.1"), "scm:git:https://github.com/tferega/PropsLoader.git")),
     pomExtra                ~= (_ ++ {Developers.toXml})
