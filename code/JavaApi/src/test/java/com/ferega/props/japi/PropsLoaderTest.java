@@ -3,6 +3,7 @@ package com.ferega.props.japi;
 import static org.junit.Assert.assertEquals;
 
 import java.io.File;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -21,17 +22,18 @@ public class PropsLoaderTest {
   public static final String LocalName    = "dsl";
   public static final String AbsoluteName = "nesto";
 
-  public static final File GlobalFolder   = new File(String.format("%s/.config/global", Home));
-  public static final File ProjectFolder  = new File(String.format("%s/.config/%s_%s", Home, ProjectName, BranchName));
+  public static final File GlobalFolder   = new File(String.format("%s/.props/global", Home));
+  public static final File ProjectFolder  = new File(String.format("%s/.props/%s_%s", Home, ProjectName, BranchName));
   public static final File AbsoluteFolder = Temp.getRoot();
 
-  public static final File AliasFile          = new File(GlobalFolder, "serverAlias");
+  public static final File AliasFile          = new File(GlobalFolder, "serverAlias.txt");
   public static final File MainConfigFile     = new File(ProjectFolder, "_");
   public static final File GlobalConfigFile   = new File(GlobalFolder, GlobalName + ".config");
   public static final File LocalConfigFile    = new File(ProjectFolder, LocalName + ".props");
   public static final File AbsoluteConfigFile = new File(AbsoluteFolder, AbsoluteName + ".bilosto");
 
-  public static final String AliasContent          = "TestServerAlias";
+  public static final String AliasContent     = TestUtil.getHostName();
+
   public static final String MainConfigContent     = String.format(GlobalName + " = global\n"
                                                                  + LocalName + " = .\n"
                                                                  + AbsoluteName + " = /" + AbsoluteFolder.toString().replace("\\", "\\\\") + "\n");
@@ -95,7 +97,7 @@ public class PropsLoaderTest {
 
   @Test
   public void serverAlias() {
-    final String expected = TestUtil.readFile(AliasFile);
+    final String expected = TestUtil.readFile(AliasFile).trim();
     final String actual   = PropsLoader.getServerAlias();
     assertEquals(expected, actual);
   }

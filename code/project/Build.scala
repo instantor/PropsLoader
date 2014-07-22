@@ -13,7 +13,7 @@ trait Default {
     EclipsePlugin.settings ++
     GraphPlugin.graphSettings ++ Seq(
       organization := "com.ferega.props",
-      version      := "0.1.0",
+      version      := "0.1.1",
       scalaVersion := "2.11.1"
     )
 
@@ -56,6 +56,9 @@ trait Default {
       )
     )
 
+  import _root_.scala.util.Try
+  import com.ferega.props.japi.PropsLoader
+
   val publishing = Seq(
     publishTo := Some(
       if (version.value endsWith "-SNAPSHOT") {
@@ -71,9 +74,11 @@ trait Default {
     pomIncludeRepository    := { _ => false },
     licenses                += ("MIT", url("http://opensource.org/licenses/MIT")),
     homepage                := Some(url("https://github.com/tferega/PropsLoader/")),
-    credentials             += Credentials(Path.userHome / ".config" / "tferega.credentials"),
+    credentials             ++= Try {
+      Seq(Credentials(PropsLoader.load("PropsLoader", false).resolve("tferega").toFile))
+    } getOrElse(Nil),
     startYear               := Some(2014),
-    scmInfo                 := Some(ScmInfo(url("https://github.com/tferega/PropsLoader/tree/0.0.5"), "scm:git:https://github.com/tferega/PropsLoader.git")),
+    scmInfo                 := Some(ScmInfo(url("https://github.com/tferega/PropsLoader/tree/0.1.1"), "scm:git:https://github.com/tferega/PropsLoader.git")),
     pomExtra                ~= (_ ++ {Developers.toXml})
   )
 }
