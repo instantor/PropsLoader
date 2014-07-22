@@ -61,8 +61,36 @@ public class PropsLoader {
     }
   }
 
+  public int getInt(final String key) {
+    final int result;
+    final String value = get(key);
+    try {
+      result = Integer.parseInt(value);
+    }
+    catch (final NumberFormatException e) {
+      throw new IllegalArgumentException(String.format("Key \"%s\" with value \"%s\" cannot be cast as int!", key, value), e);
+    }
+    return result;
+  }
+
   public Optional<String> opt(final String key) {
     return Optional.ofNullable(toMap().get(key));
+  }
+
+  public OptionalInt optInt(final String key) {
+    final OptionalInt result;
+    final Optional<String> value = opt(key);
+    if (value.isPresent()) {
+      try {
+        result = OptionalInt.of(Integer.parseInt(value.get()));
+      }
+      catch (final NumberFormatException e) {
+        throw new IllegalArgumentException(String.format("Key \"%s\" with value \"%s\" cannot be cast as int!", key, value.get()), e);
+      }
+    } else {
+      result = OptionalInt.empty();
+    }
+    return result;
   }
 
   public byte[] toByteArray() {
