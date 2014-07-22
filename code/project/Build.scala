@@ -56,9 +56,6 @@ trait Default {
       )
     )
 
-  import _root_.scala.util.Try
-  import com.ferega.props.japi.PropsLoader
-
   val publishing = Seq(
     publishTo := Some(
       if (version.value endsWith "-SNAPSHOT") {
