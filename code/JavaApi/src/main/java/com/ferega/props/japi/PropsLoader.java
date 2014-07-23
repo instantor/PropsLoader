@@ -4,26 +4,25 @@ import java.io.*;
 import java.util.*;
 
 public class PropsLoader {
-  private static final String DefaultConfig = ".props";
-
   private final File location;
   private final byte[] source;
   private Map<String, String> propsMap;
-
-  public static PropsLoader loadGlobal() {
-    return PropsLoader.load("global", false);
-  }
-
-  public static PropsLoader load(final String projectName) {
-      return load(projectName, true);
-    }
 
   public static PropsLoader load(final String projectName, final boolean useBranch) {
     final PropsLoaderFactory propsLoaderFactory = new PropsLoaderFactory(projectName);
 
     return (useBranch
-      ? propsLoaderFactory
-      : propsLoaderFactory.setPathPattern("~/" + DefaultConfig + "/%1$s/_")).build();
+      ? propsLoaderFactory.setBranchPathPattern()
+      : propsLoaderFactory.setBasicPathPattern()
+    ).build();
+  }
+
+  public static PropsLoader load(final String projectName) {
+    return load(projectName, true);
+  }
+
+  public static PropsLoader loadGlobal() {
+    return PropsLoader.load("global", false);
   }
 
   public static String getServerAlias() {
@@ -42,15 +41,23 @@ public class PropsLoader {
     final File baseFolder = this.location.getParentFile();
     final ResolvablePath path;
 
-    if (".".equals(value)) {  // Local
-      final File file = new File(baseFolder, key);
-      path = ResolvablePath.path(file);
-    } else if (value.startsWith("/")) { // Absolute
-      path = ResolvablePath.path(value.substring(1) + "/" + key);
-    } else { // From .config
-      path = new ResolvablePath("~", DefaultConfig, value, key);
+    if (isLocalResolvee(value)) {
+      path = ResolvablePath.concatenate(baseFolder, key);
+    } else if (isAbsoluteResolvee(value)) {
+      path = ResolvablePath.concatenate(value, key);
+    } else {
+      path = ResolvablePath.concatenate(ResolvablePath.UserHome, PropsLoaderFactory.ConfigFolder, value, key);
     }
     return new PropsLoader(path, true);
+  }
+
+  private boolean isLocalResolvee(final String resolvee) {
+    return ".".equals(resolvee);
+  }
+
+  private boolean isAbsoluteResolvee(final String resolvee) {
+    final File file = new File(resolvee);
+    return file.isAbsolute();
   }
 
   public String get(final String key) {

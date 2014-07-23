@@ -4,6 +4,8 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -43,7 +45,7 @@ public class ResolvablePathTest {
 
   @Test
   public void resolveSuccess() throws IOException {
-    final ResolvablePath path = new ResolvablePath("$"+path1+"$", path2, path3);
+    final ResolvablePath path = new ResolvablePath("$" + path1 + "$", path2, path3);
     final File expected = new File(new File(new File(path1Resolved), path2), path3);
     final File actual   = path.resolve(props);
     assertEquals(expected.getCanonicalPath(), actual.getCanonicalPath());
@@ -59,7 +61,7 @@ public class ResolvablePathTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void resolveFail() throws IOException {
-    new ResolvablePath(path1, "$"+path2+"$", path3).resolve(props);
+    new ResolvablePath(path1, "$" + path2 + "$", path3).resolve(props);
   }
 
   @Test
@@ -99,6 +101,88 @@ public class ResolvablePathTest {
     final ResolvablePath path = new ResolvablePath(path1, UserHomeChar, path2);
     final File expected = new File(new File(new File(path1), UserHomeChar), path2);
     final File actual   = path.resolve(props);
+    assertEquals(expected.getCanonicalPath(), actual.getCanonicalPath());
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void concatenateNothing() {
+    ResolvablePath.concatenate();
+  }
+
+  @Test
+  public void concatenateCombinations() throws IOException {
+    for (char c1 = '0'; c1 <= '4'; c1++) {
+      for (char c2 = '0'; c2 <= '4'; c2++) {
+        for (char c3 = '0'; c3 <= '4'; c3++) {
+          for (char c4 = '1'; c4 <= '4'; c4++) {
+            final String command =
+                String.valueOf(c1) +
+                String.valueOf(c2) +
+                String.valueOf(c3) +
+                String.valueOf(c4);
+            final File expected = getConcatinateExpected(command);
+            final File actual   = getConcatinateActual(command).toFile();
+            assertEquals(expected.getCanonicalPath(), actual.getCanonicalPath());
+          }
+        }
+      }
+    }
+  }
+
+  private File getConcatinateExpected(final String command) {
+    File f = null;
+    for (int n = 0; n < 4; n++) {
+      switch(command.charAt(n)) {
+        case '1': case '3':
+          if (f == null) {
+            f = new File(path1);
+          } else {
+            f = new File(f, path1);
+          }
+          break;
+        case '2': case '4':
+          if (f == null) {
+            f = new File(new File(path1), path2);
+          } else {
+            f = new File(new File(f, path1), path2);
+          }
+          break;
+        default:
+          break;
+      }
+    }
+    return f;
+  }
+
+  private ResolvablePath getConcatinateActual(final String command) {
+    final List<Object> elements = new ArrayList<>();
+    for (int n = 0; n < 4; n++) {
+      switch(command.charAt(n)) {
+        case '1':
+          elements.add(path1);
+          break;
+        case '2':
+          elements.add(path1 + "/" + path2);
+          break;
+        case '3':
+          elements.add(new File(path1));
+          break;
+        case '4':
+          elements.add(new File(new File(path1), path2));
+          break;
+        default:
+          break;
+      }
+    }
+    final Object[] elemArr = elements.toArray();
+    return ResolvablePath.concatenate(elemArr);
+  }
+
+  @Test
+  public void concatenateSingleFile() throws IOException {
+    final ResolvablePath path = ResolvablePath.concatenate(new File(path1), new File(path2));
+    final File expected = new File(new File(path1), path2);
+    final File actual   = path.toFile();
     assertEquals(expected.getCanonicalPath(), actual.getCanonicalPath());
   }
 }

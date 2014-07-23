@@ -8,7 +8,7 @@ trait Default {
   private val default =
     instantorSettings ++ Seq(
       organization := "com.instantor.props",
-      version      := "0.1.1",
+      version      := "0.1.2",
       scalaVersion := "2.11.1",
       unmanagedSourceDirectories in Compile := (scalaSource in Compile).value :: Nil,
       unmanagedSourceDirectories in Test := (scalaSource in Test).value :: Nil

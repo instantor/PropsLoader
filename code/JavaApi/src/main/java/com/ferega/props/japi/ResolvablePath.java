@@ -1,9 +1,7 @@
 package com.ferega.props.japi;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.Properties;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -12,7 +10,7 @@ public class ResolvablePath {
   private final String base;
   private final String[] partList;
 
-  private final static String UserHome = "~";
+  public final static String UserHome = "~";
   private final static Pattern ResolvablePattern = Pattern.compile("^(.*)\\$([-\\.\\w]+)\\$(.*)$");
   private static String resolvePart(final Properties props, final String part) {
     final String result;
@@ -47,19 +45,29 @@ public class ResolvablePath {
     );
   }
 
-  public static ResolvablePath path(final String path) {
-    return path(new File(path));
-  }
-
-  public static ResolvablePath path(final File path) {
-    final String[] partList = Util.deconstructFile(path);
-    final int len = partList.length;
+  public static ResolvablePath concatenate(final Object... elements) {
+    final int len = elements.length;
     if (len == 0) {
-      throw new IllegalArgumentException("Path must have at least one part!");
+      throw new IllegalArgumentException("At least one path element must be specified!");
     }
 
-    final String head = partList[0];
-    final String[] tail = Arrays.copyOfRange(partList, 1, len);
+    final List<String> partList = new ArrayList<>();
+    for (final Object element : elements) {
+      final File file;
+      if (element instanceof String) {
+        file = new File((String)element);
+      } else if (element instanceof File) {
+        file = (File)element;
+      } else {
+        throw new IllegalArgumentException(String.format("Elements must be instances of either String of File. %s found!", element.getClass().getName()));
+      }
+      final List<String> newPartList = Arrays.asList(Util.deconstructFile(file));
+      partList.addAll(newPartList);
+    }
+
+    final String[] partArray = partList.toArray(new String[0]);
+    final String head = partArray[0];
+    final String[] tail = Arrays.copyOfRange(partArray, 1, partArray.length);
     return new ResolvablePath(head, tail);
   }
 
