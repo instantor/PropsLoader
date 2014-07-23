@@ -1,80 +1,33 @@
 import sbt._
 import Keys._
 
-import com.typesafe.sbteclipse.plugin.EclipsePlugin
-import EclipsePlugin.{ EclipseKeys, EclipseProjectFlavor}
-import net.virtualvoid.sbt.graph.{ Plugin => GraphPlugin }
-
-// ----------------------------------------------------------------------------
+import com.instantor.plugin.InstantorPlugin.instantorSettings
+import com.typesafe.sbteclipse.plugin.EclipsePlugin.{ EclipseKeys, EclipseProjectFlavor}
 
 trait Default {
   private val default =
-    Defaults.defaultSettings ++
-    EclipsePlugin.settings ++
-    GraphPlugin.graphSettings ++ Seq(
-      organization := "com.ferega.props",
+    instantorSettings ++ Seq(
+      organization := "com.instantor.props",
       version      := "0.1.1",
-      scalaVersion := "2.11.1"
+      scalaVersion := "2.11.1",
+      unmanagedSourceDirectories in Compile := (scalaSource in Compile).value :: Nil,
+      unmanagedSourceDirectories in Test := (scalaSource in Test).value :: Nil
     )
 
   val scala =
-    default ++ Seq(
-      EclipseKeys.projectFlavor := EclipseProjectFlavor.Scala,
-      unmanagedSourceDirectories in Compile := (scalaSource in Compile).value :: Nil,
-      unmanagedSourceDirectories in Test := (scalaSource in Test).value :: Nil,
-      scalacOptions := Seq(
-        "-deprecation",
-        "-encoding", "UTF-8",
-        "-feature",
-        "-language:higherKinds",
-        "-language:implicitConversions",
-        "-language:postfixOps",
-        "-optimise",
-        "-unchecked",
-        "-Xcheckinit",
-        "-Xlint",
-        "-Xno-uescape",
-        "-Xverify",
-        "-Yclosure-elim",
-        "-Ydead-code",
-        "-Yinline"
-      )
-    )
+    default
 
   val java =
     default ++ Seq(
       EclipseKeys.projectFlavor := EclipseProjectFlavor.Java,
       autoScalaLibrary          := false,
       crossPaths                := false,
-      testOptions               += Tests.Argument(TestFrameworks.JUnit, "-v", "-q"),
-      unmanagedSourceDirectories in Compile := (javaSource in Compile).value :: Nil,
-      unmanagedSourceDirectories in Test    := (javaSource in Test).value :: Nil,
-      javacOptions := Seq(
-        "-deprecation",
-        "-encoding", "UTF-8",
-        "-Xlint:all"
-      )
+      testOptions               += Tests.Argument(TestFrameworks.JUnit, "-v", "-q")
     )
 
   val publishing = Seq(
-    publishTo := Some(
-      if (version.value endsWith "-SNAPSHOT") {
-        Opts.resolver.sonatypeSnapshots
-      } else {
-        Opts.resolver.sonatypeStaging
-      }
-    ),
-    javacOptions in (Compile, doc) := Seq(),
     crossScalaVersions      := Seq("2.11.1", "2.10.4"),
-    publishMavenStyle       := true,
-    publishArtifact in Test := false,
-    pomIncludeRepository    := { _ => false },
-    licenses                += ("MIT", url("http://opensource.org/licenses/MIT")),
-    homepage                := Some(url("https://github.com/tferega/PropsLoader/")),
-    credentials             += Credentials(Path.userHome / ".config" / "tferega.credentials"),
-    startYear               := Some(2014),
-    scmInfo                 := Some(ScmInfo(url("https://github.com/tferega/PropsLoader/tree/0.1.1"), "scm:git:https://github.com/tferega/PropsLoader.git")),
-    pomExtra                ~= (_ ++ {Developers.toXml})
+    publishArtifact in Test := false
   )
 }
 
