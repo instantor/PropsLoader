@@ -3,7 +3,6 @@ package com.ferega.props.japi;
 import static org.junit.Assert.assertEquals;
 
 import java.io.File;
-
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -26,14 +25,15 @@ public class PropsLoaderTest {
   public static final File ProjectFolder  = new File(String.format("%s/.props/%s_%s", Home, ProjectName, BranchName));
   public static final File AbsoluteFolder = Temp.getRoot();
 
+  public static final File GlobalGlobalFile   = new File(GlobalFolder, "_");
   public static final File AliasFile          = new File(GlobalFolder, "serverAlias.txt");
   public static final File MainConfigFile     = new File(ProjectFolder, "_");
   public static final File GlobalConfigFile   = new File(GlobalFolder, GlobalName + ".config");
   public static final File LocalConfigFile    = new File(ProjectFolder, LocalName + ".props");
   public static final File AbsoluteConfigFile = new File(AbsoluteFolder, AbsoluteName + ".bilosto");
 
-  public static final String AliasContent     = TestUtil.getHostName();
-
+  public static final String GlobalGlobalContent   = "serverAlias = .";
+  public static final String AliasContent          = "TestAliasContent";
   public static final String MainConfigContent     = String.format(GlobalName + " = global\n"
                                                                  + LocalName + " = .\n"
                                                                  + AbsoluteName + " = /" + AbsoluteFolder.toString().replace("\\", "\\\\") + "\n");
@@ -41,11 +41,21 @@ public class PropsLoaderTest {
   public static final String LocalConfigContent    = "TestDslContent";
   public static final String AbsoluteConfigContent = "TestAbsoluteConfig";
 
+  public static final File GlobalGlobalMarker = new File(AbsoluteFolder, "GlobalGlobalMarker");
+  public static final File AliasMarker        = new File(AbsoluteFolder, "AliasMarker");
+
   @BeforeClass
   public static void prepare() {
+    // Global global
+    if (!GlobalGlobalFile.exists()) {
+      TestUtil.writeFile(GlobalGlobalFile, GlobalGlobalContent);
+      TestUtil.writeFile(GlobalGlobalMarker, "");
+    }
+
     // Alias
     if (!AliasFile.exists()) {
       TestUtil.writeFile(AliasFile, AliasContent);
+      TestUtil.writeFile(AliasMarker, "");
     }
 
     // Main config
@@ -66,9 +76,13 @@ public class PropsLoaderTest {
 
   @AfterClass
   public static void clean() {
+    // Global global
+    if (GlobalGlobalMarker.exists()) {
+      GlobalGlobalFile.delete();
+    }
+
     // Alias
-    final String gc = TestUtil.readFile(AliasFile);
-    if (AliasContent.equals(gc)) {
+    if (AliasMarker.exists()) {
       AliasFile.delete();
     }
 
