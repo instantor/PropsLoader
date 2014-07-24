@@ -5,4 +5,4 @@ resolvers := Seq(
 
 externalResolvers := Resolver.withDefaultResolvers(resolvers.value, mavenCentral = false)
 
-addSbtPlugin("com.instantor" % "sbt-instantor-plugin" % "0.2.1")
+addSbtPlugin("com.instantor" % "sbt-instantor-plugin" % "0.3.0")

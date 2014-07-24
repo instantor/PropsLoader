@@ -11,7 +11,7 @@ trait Default {
     Defaults.defaultSettings ++
     InstantorPlugin.instantorSettings ++ Seq(
       organization := "com.instantor.props"
-    , version      := "0.3.1"
+    , version      := "0.3.2"
     )
 
   lazy val javaSettings =
@@ -41,10 +41,10 @@ trait Default {
 // ----------------------------------------------------------------------------
 
 trait Dependencies {
-  lazy val slf4j = "org.slf4j" %  "slf4j-api" % "1.7.7"
+  lazy val slf4j = InstantorPlugin.slf4j
 
   lazy val jUnitInterface = "com.novocode"  %  "junit-interface" % "0.11-RC1" % "test"
-  lazy val logback = "ch.qos.logback" % "logback-classic" % "1.1.2" % "test"
+  lazy val logback = InstantorPlugin.logback % "test"
 }
 
 // ----------------------------------------------------------------------------
