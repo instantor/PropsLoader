@@ -40,7 +40,7 @@ public class PropsLoaderFactory {
 
     public PropsLoader loadBranch(final String projectName, final String branch) {
         final File file = new File(propsHome, branch != null
-                ? projectName + "_" + resolveProperty(branch)
+                ? projectName + "_" + resolveProperty(branch + ".branch")
                 : projectName);
 
         logger.debug("Resolved path for _: {}", file);

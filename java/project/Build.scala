@@ -1,17 +1,17 @@
 import sbt._
 import Keys._
 
-import com.typesafe.sbteclipse.plugin.EclipsePlugin.{ EclipseKeys, EclipseProjectFlavor, EclipseCreateSrc}
-import com.instantor.plugin.InstantorPlugin
+import com.typesafe.sbteclipse.plugin.EclipsePlugin._
+import com.instantor.plugin.InstantorPlugin._
 
 // ----------------------------------------------------------------------------
 
 trait Default {
   private lazy val default =
     Defaults.defaultSettings ++
-    InstantorPlugin.instantorSettings ++ Seq(
+    instantorSettings ++ Seq(
       organization := "com.instantor.props"
-    , version      := "0.3.4"
+    , version      := "0.3.11-SNAPSHOT"
     )
 
   lazy val javaSettings =
@@ -26,13 +26,7 @@ trait Default {
     )
 
   lazy val publishing = Seq(
-    publishTo := Some(
-      if (version.value endsWith "-SNAPSHOT") {
-        InstantorPlugin.InstantorSnapshots
-      } else {
-        InstantorPlugin.InstantorReleases
-      }
-    )
+    publishTo := Some(if (version.value endsWith "-SNAPSHOT") InstantorSnapshots else InstantorReleases)
   , javacOptions in (Compile, doc) := Nil
   , publishArtifact in Test := false
   )
@@ -40,16 +34,7 @@ trait Default {
 
 // ----------------------------------------------------------------------------
 
-trait Dependencies {
-  lazy val slf4j = InstantorPlugin.slf4j
-
-  lazy val jUnitInterface = "com.novocode"  %  "junit-interface" % "0.11-RC1" % "test"
-  lazy val logback = InstantorPlugin.logback % "test"
-}
-
-// ----------------------------------------------------------------------------
-
-object PropsLoaderBuild extends Build with Default with Dependencies {
+object PropsLoaderBuild extends Build with Default {
   lazy val api = Project(
     "api"
   , file("Api")
@@ -64,7 +49,11 @@ object PropsLoaderBuild extends Build with Default with Dependencies {
   , file("Core")
   , settings = javaSettings ++ Seq(
       name := "PropsLoader-Core"
-    , libraryDependencies ++= Seq(slf4j, jUnitInterface, logback)
+    , libraryDependencies ++= Seq(
+        slf4j
+      , junitInterface
+      , logback % "test"
+      )
     , EclipseKeys.createSrc := EclipseCreateSrc.Default + EclipseCreateSrc.Resource
     )
   ) dependsOn(api)
