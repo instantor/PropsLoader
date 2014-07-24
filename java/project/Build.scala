@@ -11,7 +11,7 @@ trait Default {
     Defaults.defaultSettings ++ 
     InstantorPlugin.instantorSettings ++ Seq(
       organization := "com.instantor.props",
-      version      := "0.3.0"
+      version      := "0.3.1"
     )
 
   lazy val javaSettings =
