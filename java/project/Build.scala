@@ -8,21 +8,21 @@ import com.instantor.plugin.InstantorPlugin
 
 trait Default {
   private lazy val default =
-    Defaults.defaultSettings ++ 
+    Defaults.defaultSettings ++
     InstantorPlugin.instantorSettings ++ Seq(
-      organization := "com.instantor.props",
-      version      := "0.3.0"
+      organization := "com.instantor.props"
+    , version      := "0.3.1"
     )
 
   lazy val javaSettings =
     default ++
     publishing ++ Seq(
-      EclipseKeys.projectFlavor := EclipseProjectFlavor.Java,
-      autoScalaLibrary          := false,
-      crossPaths                := false,
-      testOptions               += Tests.Argument(TestFrameworks.JUnit, "-v", "-q"),
-      unmanagedSourceDirectories in Compile := (javaSource in Compile).value :: Nil,
-      unmanagedSourceDirectories in Test    := (javaSource in Test).value :: Nil
+      EclipseKeys.projectFlavor := EclipseProjectFlavor.Java
+    , autoScalaLibrary          := false
+    , crossPaths                := false
+    , testOptions               += Tests.Argument(TestFrameworks.JUnit, "-v", "-q")
+    , unmanagedSourceDirectories in Compile := (javaSource in Compile).value :: Nil
+    , unmanagedSourceDirectories in Test    := (javaSource in Test).value :: Nil
     )
 
   lazy val publishing = Seq(
@@ -32,9 +32,9 @@ trait Default {
       } else {
         InstantorPlugin.InstantorReleases
       }
-    ),
-    javacOptions in (Compile, doc) := Nil,
-    publishArtifact in Test := false
+    )
+  , javacOptions in (Compile, doc) := Nil
+  , publishArtifact in Test := false
   )
 }
 
@@ -51,22 +51,21 @@ trait Dependencies {
 
 object PropsLoaderBuild extends Build with Default with Dependencies {
   lazy val api = Project(
-    "api",
-    file("Api"),
-    settings = javaSettings ++ Seq(
-      name := "PropsLoader-Api",
-      unmanagedSourceDirectories in Test := Nil
+    "api"
+  , file("Api")
+  , settings = javaSettings ++ Seq(
+      name := "PropsLoader-Api"
+    , unmanagedSourceDirectories in Test := Nil
     )
   )
 
   lazy val core = Project(
-    "core",
-    file("Core"),
-    settings = javaSettings ++ Seq(
-      name := "PropsLoader-Core",
-      libraryDependencies ++= Seq(slf4j, jUnitInterface, logback),
-      unmanagedSourceDirectories in Test := (javaSource in Test).value :: Nil,
-      EclipseKeys.createSrc := EclipseCreateSrc.Default + EclipseCreateSrc.Resource
+    "core"
+  , file("Core")
+  , settings = javaSettings ++ Seq(
+      name := "PropsLoader-Core"
+    , libraryDependencies ++= Seq(slf4j, jUnitInterface, logback)
+    , EclipseKeys.createSrc := EclipseCreateSrc.Default + EclipseCreateSrc.Resource
     )
-  ).dependsOn(api)
+  ) dependsOn(api)
 }

@@ -8,7 +8,6 @@ import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Properties;
 import org.slf4j.Logger;
 
@@ -48,7 +47,7 @@ public class PropsLoaderImpl implements PropsLoader {
                 resolveMap.put(key, newLoader);
                 return newLoader;
             } catch (final Exception e) {
-              throw new IllegalArgumentException(String.format("Could not resolve key \"%s\"!", key), e);
+                throw new IllegalArgumentException(String.format("Could not resolve key \"%s\"!", key), e);
             }
         }
     }
@@ -101,7 +100,7 @@ public class PropsLoaderImpl implements PropsLoader {
             props.load(toInputStream());
             return props;
         } catch (final IOException e) {
-            throw new IllegalArgumentException("An error occured while parsing properties from: " + file, e);
+            throw new IllegalArgumentException("An error occurred while parsing properties from: " + file, e);
         }
     }
 
@@ -144,7 +143,7 @@ public class PropsLoaderImpl implements PropsLoader {
                     source = Files.readAllBytes(file.toPath());
                     logger.debug("Loaded: {} ({} bytes)", file, source.length);
                 } catch (final IOException e) {
-                    throw new RuntimeException("An error occured while trying to reading file: " + file);
+                    throw new RuntimeException("An error occurred while trying to reading file: " + file);
                 }
             }
         }
