@@ -14,19 +14,54 @@ import java.util.Properties;
 import org.slf4j.Logger;
 
 public class PropsLoaderImpl implements PropsLoader {
-    private final PropsFactoryResolver propsFactoryResolver;
     private final Logger logger;
+    private final String propsHome;
     private final File file;
 
-    PropsLoaderImpl(final Logger logger, final PropsLoaderFactory propsLoaderFactory, final File file) {
+    PropsLoaderImpl(final Logger logger, final String propsHome, final File file) {
         this.logger = logger;
-        this.propsFactoryResolver = propsLoaderFactory;
-        this.file = file;
+        this.propsHome = propsHome;
+        this.file = findSingleFile(file);
     }
+
+    private final Object resolveMapLock = new Object();
+    private Map<String, PropsLoader> resolveMap;
 
     @Override
     public PropsLoader resolve(final String key) {
-        return propsFactoryResolver.resolve(file.getParentFile(), key, get(key));
+        synchronized (resolveMapLock) {
+            if (resolveMap == null) {
+                resolveMap = new LinkedHashMap<>();
+            }
+
+            final PropsLoader cachedLoader = resolveMap.get(key);
+            if (cachedLoader != null) return cachedLoader;
+
+            final File base = file.getParentFile();
+            final String value = get(key);
+
+            final File resolvedFile = value.equals(".")
+                    ? findSingleFile(new File(base, key))
+                    : findSingleFile(new File(propsHome, value + "/" + key));
+
+            final PropsLoader newLoader = new PropsLoaderImpl(logger, propsHome, resolvedFile);
+            resolveMap.put(key, newLoader);
+            return newLoader;
+        }
+    }
+
+    private static File findSingleFile(final File file) {
+        final File parent = file.getParentFile();
+        final String name = file.getName();
+        final File[] foundFileList = parent.listFiles((p, n) -> n.startsWith(name));
+        switch (foundFileList.length) {
+            case 0:
+                throw new IllegalArgumentException(String.format("File with prefix \"%s\" not found!", name));
+            case 1:
+                return foundFileList[0];
+            default:
+                throw new IllegalArgumentException(String.format("Ambiguous resolution, more than one file with prefix \"%s\" was found!", name));
+        }
     }
 
     @Override

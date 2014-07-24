@@ -5,7 +5,9 @@ import java.io.InputStream;
 import java.util.Map;
 import java.util.Properties;
 
-public interface PropsLoader extends PropsResolver {
+public interface PropsLoader {
+    public PropsLoader resolve(final String key);
+
     public String get(final String key);
     public int getInt(final String key);
 

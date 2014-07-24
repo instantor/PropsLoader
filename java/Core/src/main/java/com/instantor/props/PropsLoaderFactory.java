@@ -4,7 +4,7 @@ import java.io.File;
 
 import org.slf4j.Logger;
 
-public class PropsLoaderFactory implements PropsFactoryResolver {
+public class PropsLoaderFactory {
     private final Logger logger;
     private final String propsHome;
 
@@ -30,21 +30,21 @@ public class PropsLoaderFactory implements PropsFactoryResolver {
         return value;
     }
 
-    public PropsResolver loadPure(final String projectName) {
+    public PropsLoader loadPure(final String projectName) {
         return loadBranch(projectName, null);
     }
 
-    public PropsResolver loadBranch(final String projectName) {
+    public PropsLoader loadBranch(final String projectName) {
         return loadBranch(projectName, projectName);
     }
 
-    public PropsResolver loadBranch(final String projectName, final String branch) {
-        final File file = findSingleFile(new File(propsHome, branch == null
+    public PropsLoader loadBranch(final String projectName, final String branch) {
+        final File file = new File(propsHome, branch == null
                 ? projectName + "_" + resolveProperty(branch)
-                : projectName));
+                : projectName);
 
-        logger.debug("Resolved file: {}", file);
-        final PropsLoader propsResolver = new PropsLoaderImpl(logger, this, file);
+        logger.debug("Resolved path for _: {}", file);
+        final PropsLoader propsResolver = new PropsLoaderImpl(logger, propsHome, new File(file, "_"));
 
         // Eagerly try to resolve all references, and fail early.
         for (final String key : propsResolver.toMap().keySet()) {
@@ -60,29 +60,5 @@ public class PropsLoaderFactory implements PropsFactoryResolver {
         }
 
         return propsResolver;
-    }
-
-    private File findSingleFile(final File file) {
-        final File parent = file.getParentFile();
-        final String name = file.getName();
-        final File[] foundFileList = parent.listFiles((p, n) -> n.startsWith(name));
-        switch (foundFileList.length) {
-            case 0:
-                throw new IllegalArgumentException(String.format("File with prefix \"%s\" not found!", name));
-            case 1:
-                return foundFileList[0];
-            default:
-                throw new IllegalArgumentException(String.format("Ambiguous resolution, more than one file with prefix \"%s\" was found!", name));
-        }
-    }
-
-    // resolve callback from PropsLoaderImpl
-    @Override
-    public PropsLoader resolve(final File base, final String key, final String value) {
-        final File resolvedFile = value.equals(".")
-                ? findSingleFile(new File(base, key))
-                : findSingleFile(new File(propsHome, value + "/" + key));
-
-        return new PropsLoaderImpl(logger, this, resolvedFile);
     }
 }
