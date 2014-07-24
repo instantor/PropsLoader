@@ -1,20 +1,17 @@
 import sbt._
 import Keys._
 
-import com.typesafe.sbteclipse.plugin.EclipsePlugin
-import EclipsePlugin.{ EclipseKeys, EclipseProjectFlavor, EclipseCreateSrc}
-import net.virtualvoid.sbt.graph.{ Plugin => GraphPlugin }
+import com.typesafe.sbteclipse.plugin.EclipsePlugin.{ EclipseKeys, EclipseProjectFlavor, EclipseCreateSrc}
+import com.instantor.plugin.InstantorPlugin
 
 // ----------------------------------------------------------------------------
 
 trait Default {
   private lazy val default =
-    Defaults.defaultSettings ++
-    EclipsePlugin.settings ++
-    GraphPlugin.graphSettings ++ Seq(
+    Defaults.defaultSettings ++ 
+    InstantorPlugin.instantorSettings ++ Seq(
       organization := "com.instantor.props",
-      version      := "0.3.0",
-      scalaVersion := "2.11.1"
+      version      := "0.3.0"
     )
 
   lazy val javaSettings =
@@ -25,24 +22,18 @@ trait Default {
       crossPaths                := false,
       testOptions               += Tests.Argument(TestFrameworks.JUnit, "-v", "-q"),
       unmanagedSourceDirectories in Compile := (javaSource in Compile).value :: Nil,
-      unmanagedSourceDirectories in Test    := (javaSource in Test).value :: Nil,
-      javacOptions := Seq(
-        "-deprecation",
-        "-encoding", "UTF-8",
-        "-Xlint:all"
-      )
+      unmanagedSourceDirectories in Test    := (javaSource in Test).value :: Nil
     )
 
   lazy val publishing = Seq(
     publishTo := Some(
       if (version.value endsWith "-SNAPSHOT") {
-        Opts.resolver.sonatypeSnapshots
+        InstantorPlugin.InstantorSnapshots
       } else {
-        Opts.resolver.sonatypeStaging
+        InstantorPlugin.InstantorReleases
       }
     ),
     javacOptions in (Compile, doc) := Nil,
-    crossScalaVersions      := Seq("2.11.1"),
     publishArtifact in Test := false
   )
 }
