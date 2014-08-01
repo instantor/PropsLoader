@@ -22,7 +22,7 @@ set OLD_DIR=%CD%\
 call :push_descend
 for %%a in ("%CD%\*.branch") do (
   set /p current=<"%%~fa"
-  echo Found %%~fa = !current!
+  echo Found %%~fa := !current!
   set branches=!branches! -D%%~nxa="!current!"
 ) 
 goto :EOF
