@@ -113,10 +113,7 @@ public class PropsLoaderImpl implements PropsLoader {
 
     @Override
     public String get(final String key) {
-        if (key == null) {
-            throw new IllegalArgumentException(String.format("Key cannot be null!"));
-        }
-        final String value = toMap().get(key);
+        final String value = get(key, null);
         if (value == null) {
             throw new IllegalArgumentException(String.format("Key \"%s\" not found", key));
         }
@@ -124,8 +121,32 @@ public class PropsLoaderImpl implements PropsLoader {
     }
 
     @Override
+    public String get(final String key, final String defaultValue) {
+        if (key == null) {
+            throw new IllegalArgumentException(String.format("Key cannot be null!"));
+        }
+        final String value = toMap().get(key);
+        if (value == null) {
+            return defaultValue;
+        }
+        return value;
+    }
+
+    @Override
     public int getInt(final String key) {
         final String value = get(key);
+        try {
+            return Integer.parseInt(value);
+        } catch (final NumberFormatException e) {
+            throw new IllegalArgumentException(String.format("Key \"%s\" with value \"%s\" cannot be cast to int!", key, value), e);
+        }
+    }
+
+    @Override
+    public int getInt(final String key, final int defaultValue) {
+        final String value = get(key, null);
+        if (value == null) return defaultValue;
+
         try {
             return Integer.parseInt(value);
         } catch (final NumberFormatException e) {

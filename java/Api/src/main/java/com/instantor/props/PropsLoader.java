@@ -6,7 +6,10 @@ import java.util.Properties;
 
 public interface PropsLoader extends PropsResolver, Iterable<Map.Entry<String, String>>{
     public String get(final String key);
+    public String get(final String key, final String defaultValue);
+
     public int getInt(final String key);
+    public int getInt(final String key, final int defaultValue);
 
     public Map<String, String> toMap();
     public Properties toProps();
