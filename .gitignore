@@ -3,5 +3,8 @@
 .project
 .settings
 .metadata
-target
 .target
+
+target
+
+*.branch
