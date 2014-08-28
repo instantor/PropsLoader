@@ -1,10 +1,10 @@
 package com.instantor.props;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.InetAddress;
-import java.nio.file.Files;
 
 import org.junit.rules.TemporaryFolder;
 
@@ -39,8 +39,11 @@ public class TestUtil {
 
     static String readFile(final File file) {
         try {
-            final byte[] body = Files.readAllBytes(file.toPath());
-            return new String(body, "ISO-8859-1");
+            final byte[] buffer = new byte[(int) file.length()];
+            final FileInputStream fis = new FileInputStream(file);
+            fis.read(buffer);
+            fis.close();
+            return new String(buffer, "ISO-8859-1");
         } catch (final IOException e) {
             throw new RuntimeException("Error in tests!", e);
         }

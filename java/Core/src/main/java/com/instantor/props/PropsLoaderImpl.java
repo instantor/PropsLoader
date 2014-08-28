@@ -2,12 +2,14 @@ package com.instantor.props;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
@@ -33,6 +35,7 @@ public class PropsLoaderImpl implements PropsLoader {
     private Map<String, PropsLoader> resolveMap;
 
     private static final Pattern resolverPattern = Pattern.compile("^(.*)[\\/]_(\\.\\w+)?$");
+
     static boolean isResolver(final String value) {
         return resolverPattern.matcher(value).matches();
     }
@@ -42,17 +45,15 @@ public class PropsLoaderImpl implements PropsLoader {
         synchronized (resolverMapLock) {
             try {
                 if (resolverMap == null) {
-                    resolverMap = new LinkedHashMap<>();
+                    resolverMap = new LinkedHashMap<String, PropsLoader>();
                 }
 
                 final PropsLoader cachedResolver = resolverMap.get(key);
                 if (cachedResolver != null) return cachedResolver;
 
                 final String value = get(key);
-                if (!isResolver(value)) {
-                    throw new IllegalArgumentException(String.format(
-                            "Could not load resolver for key \"%s\", value \"%s\" is not in underscore main config format!", key, value));
-                }
+                if (!isResolver(value)) { throw new IllegalArgumentException(String.format(
+                        "Could not load resolver for key \"%s\", value \"%s\" is not in underscore main config format!", key, value)); }
 
                 final File resolvedFile = findSingleFile(new File(propsHome, value));
 
@@ -70,7 +71,7 @@ public class PropsLoaderImpl implements PropsLoader {
         synchronized (resolveMapLock) {
             try {
                 if (resolveMap == null) {
-                    resolveMap = new LinkedHashMap<>();
+                    resolveMap = new LinkedHashMap<String, PropsLoader>();
                 }
 
                 final PropsLoader cachedLoader = resolveMap.get(key);
@@ -95,17 +96,20 @@ public class PropsLoaderImpl implements PropsLoader {
     private static File findSingleFile(final File file) {
         final File parent = file.getParentFile();
         final String name = file.getName();
-        final File[] foundFileList = parent.listFiles((p, n) -> n.startsWith(name));
 
-        if (foundFileList == null) {
-          throw new IllegalArgumentException(String.format("File with prefix \"%s\" not found in folder %s", name, parent.toString()));
+        final File[] files = parent.listFiles();
+        if (files == null) { throw new IllegalArgumentException(String.format("File with prefix \"%s\" not found in folder %s", name, parent.toString())); }
+
+        final List<File> foundFileList = new ArrayList<File>();
+        for (final File curFile : files) {
+            if (curFile.getName().startsWith(name)) foundFileList.add(curFile);
         }
 
-        switch (foundFileList.length) {
+        switch (foundFileList.size()) {
             case 0:
                 throw new IllegalArgumentException(String.format("File with prefix \"%s\" not found!", name));
             case 1:
-                return foundFileList[0];
+                return foundFileList.get(0);
             default:
                 throw new IllegalArgumentException(String.format("Ambiguous resolution, more than one file with prefix \"%s\" was found!", name));
         }
@@ -172,7 +176,7 @@ public class PropsLoaderImpl implements PropsLoader {
     public Map<String, String> toMap() {
         synchronized (propsMapLock) {
             if (propsMap == null) {
-                propsMap = new LinkedHashMap<>();
+                propsMap = new LinkedHashMap<String, String>();
                 final Properties props = toProps();
                 for (final String name : props.stringPropertyNames()) {
                     propsMap.put(name, props.getProperty(name));
@@ -201,7 +205,11 @@ public class PropsLoaderImpl implements PropsLoader {
             if (source == null) {
                 try {
                     logger.trace("About to load: {}", file);
-                    source = Files.readAllBytes(file.toPath());
+                    final byte[] buffer = new byte[(int) file.length()];
+                    final FileInputStream fis = new FileInputStream(file);
+                    fis.read(buffer);
+                    fis.close();
+                    source = buffer;
                     logger.debug("Loaded: {} ({} bytes)", file, source.length);
                 } catch (final IOException e) {
                     throw new RuntimeException("An error occurred while trying to reading file: " + file);

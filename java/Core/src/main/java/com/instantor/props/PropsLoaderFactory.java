@@ -41,11 +41,12 @@ public class PropsLoaderFactory {
         return loadBranch(projectName, projectName);
     }
 
-    private final Map<Map.Entry<String, String>, PropsResolver> resolverCache = new LinkedHashMap<>();
+    private final Map<Map.Entry<String, String>, PropsResolver> resolverCache =
+            new LinkedHashMap<Map.Entry<String, String>, PropsResolver>();
 
     public PropsResolver loadBranch(final String projectName, final String branch) {
         final Map.Entry<String, String> projectBranch =
-                new AbstractMap.SimpleEntry<>(projectName, branch);
+                new AbstractMap.SimpleEntry<String, String>(projectName, branch);
 
         synchronized (resolverCache) {
             final PropsResolver cachedResolver = resolverCache.get(projectBranch);

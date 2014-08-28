@@ -12,9 +12,18 @@ trait Default {
     instantorSettings ++
     javaSettings ++ Seq(
       organization := "com.instantor.props"
-    , version      := "0.3.17"
+    , version      := "0.3.19-SNAPSHOT"
+
     , publicRelease
     , publishArtifact in Test := false
+
+    , javacOptions := Seq(
+        "-target", "1.6"
+      , "-source", "1.6"
+      ) ++ (sys.env.get("JDK16_HOME") match {
+        case Some(jdk16Home) => Seq("-bootclasspath", jdk16Home + "/jre/lib/rt.jar")
+        case _ => Nil
+      })
     )
 }
 

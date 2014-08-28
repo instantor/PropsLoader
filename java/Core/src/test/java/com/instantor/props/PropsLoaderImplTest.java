@@ -133,7 +133,7 @@ public class PropsLoaderImplTest {
 
     @Test
     public void toMap() {
-        final Map<String, String> expected = new HashMap<>();
+        final Map<String, String> expected = new HashMap<String, String>();
         expected.put("host", "localhost");
         expected.put("port", "9000");
         final Map<String, String> actual = pl.resolve("nexus").toMap();
