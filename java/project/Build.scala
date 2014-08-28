@@ -12,7 +12,7 @@ trait Default {
     instantorSettings ++
     javaSettings ++ Seq(
       organization := "com.instantor.props"
-    , version      := "0.3.17-SNAPSHOT"
+    , version      := "0.3.17"
     , publicRelease
     , publishArtifact in Test := false
     )

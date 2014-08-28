@@ -30,7 +30,7 @@ public class PropsLoaderFactory {
         final String value = System.getProperty(key);
         logger.trace("Resolving system property \"{}\": {}", key, value);
         if (value == null) throw new IllegalArgumentException("System property \"" + key + "\" was undefined!");
-        return value;
+        return value.trim();
     }
 
     public PropsResolver loadPure(final String projectName) {
@@ -43,9 +43,7 @@ public class PropsLoaderFactory {
 
     private final Map<Map.Entry<String, String>, PropsResolver> resolverCache = new LinkedHashMap<>();
 
-    public PropsResolver loadBranch(final String projectName, String branch) {
-        branch = branch.trim();
-
+    public PropsResolver loadBranch(final String projectName, final String branch) {
         final Map.Entry<String, String> projectBranch =
                 new AbstractMap.SimpleEntry<>(projectName, branch);
 
